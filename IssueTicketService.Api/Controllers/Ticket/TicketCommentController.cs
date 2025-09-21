@@ -1,8 +1,6 @@
-using System.Net;
 using System.Security.Claims;
 using IssueTicketService.Application.Dto.Ticket;
 using IssueTicketService.Application.Services.Ticket;
-using IssueTicketService.Core.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IssueTicketService.Api.Controllers.Ticket
@@ -20,8 +18,22 @@ namespace IssueTicketService.Api.Controllers.Ticket
             _ticketCommentService = ticketCommentService;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Create(TicketCommentCreateDto comment)
+        [HttpGet("Ticket/{ticketId}/Comments")]
+        public async Task<IActionResult> Get(int ticketId, int page = 0, int size = 10)
+        {
+            try
+            {
+                return new JsonResult(await _ticketCommentService.GetAll(ticketId, page, size));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message, ex);
+                return StatusCode(500);
+            }
+        }
+
+        [HttpPost("TicketComment/Create")]
+        public async Task<IActionResult> Create([FromBody]TicketCommentCreateDto comment)
         {
             try
             {
@@ -40,5 +52,34 @@ namespace IssueTicketService.Api.Controllers.Ticket
                 return StatusCode(500);
             }
         }
+
+        [HttpPut]
+        public async Task<IActionResult> Edit()
+        {
+            try
+            {
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message, ex);
+                return StatusCode(500);
+            }
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> Delete()
+        {
+            try
+            {
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.Message, ex);
+                return StatusCode(500);
+            }
+        }
+
     }
 }

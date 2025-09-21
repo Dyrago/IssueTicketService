@@ -17,6 +17,7 @@ namespace IssueTicketService.Application.Dto.Ticket
         public TicketResponseDto()
         {
             Comments = new List<Comment>();
+            Status = TicketStatusEnum.New.ToString();
         }
 
         public TicketResponseDto(Core.Entities.Ticket ticket)
