@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using IssueTicketService.Application.Dto.Ticket;
 using IssueTicketService.Application.Services.Ticket;
+using IssueTicketService.Core.BusinessObjects;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,11 +22,19 @@ namespace IssueTicketService.Api.Controllers
         }
 
         [HttpGet("Tickets")]
-        public async Task<IActionResult> Search()
+        public async Task<IActionResult> Search(TicketSearchFilter filter)
         {
             try
             {
-                return new JsonResult(await _ticketService.Get());
+                var userGuid = User.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier)?.FirstOrDefault()?.Value;
+
+                if (userGuid == null)
+                    return Unauthorized();
+
+                if (!User.IsInRole("Admin") || !User.IsInRole("Mod"))
+                    filter.UserId = new Guid(userGuid);
+
+                return new JsonResult(await _ticketService.Search(filter));
             }
             catch (Exception ex)
             {

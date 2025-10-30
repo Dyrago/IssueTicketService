@@ -1,4 +1,6 @@
 using IssueTicketService.Application.Dto.Ticket;
+using IssueTicketService.Application.Services.User;
+using IssueTicketService.Core.BusinessObjects;
 using IssueTicketService.Core.Repositories;
 
 namespace IssueTicketService.Application.Services.Ticket
@@ -6,10 +8,14 @@ namespace IssueTicketService.Application.Services.Ticket
     public class TicketService : ITicketService
     {
         private readonly ITicketRepository _ticketRepository;
+        private readonly IUserService _userService;
 
-        public TicketService(ITicketRepository ticketRepository)
+        public TicketService(
+            ITicketRepository ticketRepository,
+            IUserService userService)
         {
             _ticketRepository = ticketRepository;
+            _userService = userService;
         }
 
         public async Task Create(TicketRequestDto dto, Guid userGuid)
@@ -29,9 +35,9 @@ namespace IssueTicketService.Application.Services.Ticket
             await _ticketRepository.Delete(id);
         }
 
-        public async Task<IEnumerable<TicketResponseDto>> Get()
-        {
-            var tickets = await _ticketRepository.Get();
+        public async Task<IEnumerable<TicketResponseDto>> Search(TicketSearchFilter filter)
+        {  
+            var tickets = await _ticketRepository.Search(filter);
 
             return tickets.Select(t => new TicketResponseDto(t));
         }

@@ -1,3 +1,4 @@
+using IssueTicketService.Core.BusinessObjects;
 using IssueTicketService.Core.Repositories;
 using IssueTicketService.Infrastructure.Connection;
 using Microsoft.EntityFrameworkCore;
@@ -29,10 +30,22 @@ namespace IssueTicketService.Infrastructure.Repositories.Ticket
             await context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<Core.Entities.Ticket>> Get()
+        public async Task<IEnumerable<Core.Entities.Ticket>> Search(TicketSearchFilter filter)
         {
             using var context = _contextFactory.CreateDbContext();
-            var tickets = await context.Tickets.ToListAsync();
+
+            var query = context.Tickets.AsQueryable();
+
+            if (filter.UserId.HasValue)
+                query = query.Where(t => t.ReporterId == filter.UserId);
+
+            if (!string.IsNullOrEmpty(filter.Contains))
+                query = query.Where(t => t.Content.Contains(filter.Contains) || t.Title.Contains(filter.Contains));
+
+            if (filter.CreateDate.HasValue)
+                query = query.Where(t => t.CreateDate == filter.CreateDate);          
+
+            var tickets = await query.ToListAsync();
 
             return tickets;
         }

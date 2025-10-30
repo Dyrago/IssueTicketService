@@ -1,8 +1,10 @@
+using IssueTicketService.Core.BusinessObjects;
+
 namespace IssueTicketService.Core.Repositories
 {
     public interface ITicketRepository
     {
-        Task<IEnumerable<Core.Entities.Ticket>> Get();
+        Task<IEnumerable<Core.Entities.Ticket>> Search(TicketSearchFilter filter);
         Task<Core.Entities.Ticket?> GetById(int id);
         Task<IEnumerable<Core.Entities.Ticket?>> GetByUserId(Guid userId);
         Task Create(Core.Entities.Ticket ticket);
