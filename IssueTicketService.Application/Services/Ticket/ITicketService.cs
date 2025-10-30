@@ -4,7 +4,7 @@ namespace IssueTicketService.Application.Services.Ticket
 {
     public interface ITicketService
     {
-        Task<IEnumerable<TicketResponseDto>> Get();
+        Task<IEnumerable<TicketResponseDto>> Search(Guid userId);
         Task<TicketResponseDto?> GetById(int id);
         Task<IEnumerable<TicketResponseDto?>> GetByUserId(Guid userId);
         Task Create(TicketRequestDto ticket, Guid userId);

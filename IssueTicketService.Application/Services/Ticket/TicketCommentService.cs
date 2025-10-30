@@ -27,9 +27,9 @@ namespace IssueTicketService.Application.Services.Ticket
             });
         }
 
-        public Task Delete(int id)
+        public async Task Delete(int id)
         {
-            throw new NotImplementedException();
+            await _ticketCommentRepository.Delete(id);
         }
 
         public Task Edit(int id, Comment comment)
@@ -58,9 +58,15 @@ namespace IssueTicketService.Application.Services.Ticket
             };
         }
 
-        public async Task<IEnumerable<Comment>> GetAll(int ticketId, int page, int size)
+        public async Task<TicketCommentSearchResultDto> Search(int ticketId, int page, int size)
         {
-            return await _ticketCommentRepository.GetAll(ticketId, page, size);
+            var (comments, totalRowsCount) = await _ticketCommentRepository.Search(ticketId, page, size);
+
+            return new TicketCommentSearchResultDto()
+            {
+                Comments = comments.Select(c => new TicketCommentDto(c)),
+                TotalRowsCount = totalRowsCount
+            };
         }
     }
 }

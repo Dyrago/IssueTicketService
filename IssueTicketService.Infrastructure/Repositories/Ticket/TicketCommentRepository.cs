@@ -1,3 +1,4 @@
+using IssueTicketService.Application.Dto.Ticket;
 using IssueTicketService.Core.Entities;
 using IssueTicketService.Core.Repositories;
 using IssueTicketService.Infrastructure.Connection;
@@ -22,9 +23,12 @@ namespace IssueTicketService.Infrastructure.Repositories.Ticket
             await context.SaveChangesAsync();
         }
 
-        public Task Delete(int id)
+        public async Task Delete(int id)
         {
-            throw new NotImplementedException();
+            var context = await _contextFactory.CreateDbContextAsync();
+
+            await context.Comments.Where(c => c.Id == id).ExecuteDeleteAsync();
+            await context.SaveChangesAsync();
         }
 
         public Task Edit(int id, Comment comment)
@@ -32,18 +36,20 @@ namespace IssueTicketService.Infrastructure.Repositories.Ticket
             throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<Comment>> GetAll(int ticketId, int page, int size)
+        public async Task<(IEnumerable<Comment>, int)> Search(int ticketId, int page, int size)
         {
             var context = await _contextFactory.CreateDbContextAsync();
+            var totalRowsCount = await context.Comments.Where(c => c.TicketId == ticketId).CountAsync();
 
             var comments = await context.Comments
+            .Include(c => c.User)
             .Where(c => c.TicketId == ticketId)
             .OrderByDescending(c => c.Id)
             .Skip(page * size)
             .Take(size)
             .ToListAsync();
 
-            return comments;
+            return (comments, totalRowsCount);
         }
 
         public async Task<Comment?> Get(int id)

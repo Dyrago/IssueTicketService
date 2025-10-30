@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace IssueTicketService.Api.Controllers
 {
+    [Authorize(Roles = "Admin,Mod,User")]
     public class TicketController : AuthorizedController
     {
         private readonly ITicketService _ticketService;
@@ -19,9 +20,8 @@ namespace IssueTicketService.Api.Controllers
             _logger = logger;
         }
 
-        [Authorize(Roles = "Admin,Mod,User")]
         [HttpGet("Tickets")]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Search()
         {
             try
             {
@@ -34,7 +34,6 @@ namespace IssueTicketService.Api.Controllers
             }
         }
 
-        [Authorize(Roles = "Admin,Mod,User")]
         [HttpGet("Ticket/{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -51,13 +50,13 @@ namespace IssueTicketService.Api.Controllers
 
         [Authorize(Roles = "Admin,Mod")]
         [HttpPost("Ticket/{id}/ChangeStatus")]
-        public async Task<IActionResult> GetById(int id, [FromBody] int statusId)
+        public async Task<IActionResult> ChangeStatus(int id, [FromBody] int statusId)
         {
             try
             {
                 await _ticketService.ChangeStatus(id, statusId);
 
-                return new JsonResult(new { Data = "Status changed successfuly."});
+                return new JsonResult(new { Data = "Status changed successfuly." });
             }
             catch (Exception ex)
             {
@@ -66,7 +65,6 @@ namespace IssueTicketService.Api.Controllers
             }
         }
 
-        [Authorize(Roles = "Admin,Mod,User")]
         [HttpGet("Tickets/User/{guid}")]
         public async Task<IActionResult> GetById(string guid)
         {
@@ -81,9 +79,8 @@ namespace IssueTicketService.Api.Controllers
             }
         }
 
-        [Authorize(Roles = "Admin,Mod,User")]
         [HttpPut("Ticket/Edit/{id}")]
-        public async Task<IActionResult> Edit(int id, [FromBody]TicketRequestDto ticket)
+        public async Task<IActionResult> Edit(int id, [FromBody] TicketRequestDto ticket)
         {
             try
             {
@@ -97,7 +94,6 @@ namespace IssueTicketService.Api.Controllers
             }
         }
 
-        [Authorize(Roles = "Admin,Mod,User")]
         [HttpDelete("Ticket/Delete/{id}")]
         public async Task<IActionResult> Delete(int id)
         {
@@ -113,9 +109,9 @@ namespace IssueTicketService.Api.Controllers
             }
         }
 
-        [Authorize(Roles = "User")]
+        [Authorize(Roles = "Admin,User")]
         [HttpPost("Ticket/Create")]
-        public async Task<IActionResult> Create([FromBody]TicketRequestDto ticket)
+        public async Task<IActionResult> Create([FromBody] TicketRequestDto ticket)
         {
             try
             {

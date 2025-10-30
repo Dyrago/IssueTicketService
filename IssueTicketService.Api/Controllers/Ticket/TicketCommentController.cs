@@ -19,11 +19,11 @@ namespace IssueTicketService.Api.Controllers.Ticket
         }
 
         [HttpGet("Ticket/{ticketId}/Comments")]
-        public async Task<IActionResult> Get(int ticketId, int page = 0, int size = 10)
+        public async Task<IActionResult> Search(int ticketId, int page = 0, int size = 10)
         {
             try
             {
-                return new JsonResult(await _ticketCommentService.GetAll(ticketId, page, size));
+                return new JsonResult(await _ticketCommentService.Search(ticketId, page, size));
             }
             catch (Exception ex)
             {
@@ -53,8 +53,8 @@ namespace IssueTicketService.Api.Controllers.Ticket
             }
         }
 
-        [HttpPut]
-        public async Task<IActionResult> Edit()
+        [HttpPut("TicketComment/Edit")]
+        public async Task<IActionResult> Edit([FromBody] TicketCommentEditDto comment)
         {
             try
             {
@@ -67,11 +67,12 @@ namespace IssueTicketService.Api.Controllers.Ticket
             }
         }
 
-        [HttpDelete]
-        public async Task<IActionResult> Delete()
+        [HttpDelete("TicketComment/{commentId}/Delete")]
+        public async Task<IActionResult> Delete(int commentId)
         {
             try
             {
+                await _ticketCommentService.Delete(commentId);
                 return Ok();
             }
             catch (Exception ex)
