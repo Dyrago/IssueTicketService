@@ -21,6 +21,10 @@ namespace IssueTicketService.Infrastructure.Connection
         public DbSet<Comment> Comments { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         
+
+        //This configuration looks for classes with IEntityTypeConfiguration<T> 
+        // where configuration for each table happens
+        //  instead of putting every class configuration into OnModelCreating
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());

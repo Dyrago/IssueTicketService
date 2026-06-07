@@ -23,19 +23,9 @@ namespace IssueTicketService.Infrastructure.Configuration
                      builder.HasMany(user => user.Roles)
                             .WithMany(role => role.Users);
 
-                     builder.HasMany(u => u.ReportedTickets)
-                            .WithOne(t => t.Reporter)
-                            .HasForeignKey(t => t.ReporterId)
-                            .OnDelete(DeleteBehavior.Restrict);
-
-                     builder.HasMany(u => u.ResolvedTickets)
-                            .WithOne(t => t.Resolver)
-                            .HasForeignKey(t => t.ResolverId)
-                            .OnDelete(DeleteBehavior.Restrict);
-
                      builder.HasMany(u => u.Comments)
                             .WithOne(c => c.User)
                             .HasForeignKey(c => c.UserId);
-        }
+       }
     }
 }

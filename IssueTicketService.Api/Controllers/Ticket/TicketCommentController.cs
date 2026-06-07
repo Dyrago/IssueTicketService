@@ -1,6 +1,8 @@
 using System.Security.Claims;
 using IssueTicketService.Application.Dto.Ticket;
 using IssueTicketService.Application.Services.Ticket;
+using IssueTicketService.Core.Entities;
+using IssueTicketService.Core.Enums;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IssueTicketService.Api.Controllers.Ticket
@@ -19,11 +21,26 @@ namespace IssueTicketService.Api.Controllers.Ticket
         }
 
         [HttpGet("Ticket/{ticketId}/Comments")]
-        public async Task<IActionResult> Search(int ticketId, int page = 0, int size = 10)
+        public async Task<IActionResult> Search(TicketCommentsSearchFilter filter)
         {
             try
             {
-                return new JsonResult(await _ticketCommentService.Search(ticketId, page, size));
+                var userGuid = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                
+                if(userGuid == null)
+                    return Unauthorized();
+
+                if (User.IsInRole(RoleEnum.Admin.ToString()))
+                    return Ok(await _ticketCommentService.Search(filter, new Guid(userGuid), RoleEnum.Admin));
+                
+                else if (User.IsInRole(RoleEnum.Moderator.ToString()))
+                    return Ok(await _ticketCommentService.Search(filter, new Guid(userGuid), RoleEnum.Moderator));
+
+                else if (User.IsInRole(RoleEnum.User.ToString()))
+                    return Ok(await _ticketCommentService.Search(filter, new Guid(userGuid), RoleEnum.User));
+
+                return Forbid();
+
             }
             catch (Exception ex)
             {
@@ -37,14 +54,23 @@ namespace IssueTicketService.Api.Controllers.Ticket
         {
             try
             {
-                var userGuid = User.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier).First().Value;
+                var userGuid = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
                 if (userGuid == null)
                     return Unauthorized();
+                
+                if (User.IsInRole(RoleEnum.Admin.ToString()))
+                    await _ticketCommentService.Create(comment, new Guid(userGuid), RoleEnum.Admin);
+                
+                else if (User.IsInRole(RoleEnum.Moderator.ToString()))
+                    await _ticketCommentService.Create(comment, new Guid(userGuid), RoleEnum.Moderator);
 
-                await _ticketCommentService.Create(comment, new Guid(userGuid));
+                else if (User.IsInRole(RoleEnum.User.ToString()))
+                    await _ticketCommentService.Create(comment, new Guid(userGuid), RoleEnum.User);
+                else
+                    return Forbid();
 
-                return Ok();
+                return StatusCode(StatusCodes.Status201Created);
             }
             catch (Exception ex)
             {
@@ -58,6 +84,20 @@ namespace IssueTicketService.Api.Controllers.Ticket
         {
             try
             {
+                var userGuid = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                if (userGuid == null)
+                    return Unauthorized();
+
+                if (User.IsInRole(RoleEnum.Admin.ToString()))
+                    await _ticketCommentService.Edit(comment, new Guid(userGuid), RoleEnum.Admin);
+
+                if (User.IsInRole(RoleEnum.Moderator.ToString()))
+                    await _ticketCommentService.Edit(comment, new Guid(userGuid), RoleEnum.Moderator);
+
+                if (User.IsInRole(RoleEnum.User.ToString()))
+                    await _ticketCommentService.Edit(comment, new Guid(userGuid), RoleEnum.User);
+
                 return Ok();
             }
             catch (Exception ex)
@@ -72,7 +112,20 @@ namespace IssueTicketService.Api.Controllers.Ticket
         {
             try
             {
-                await _ticketCommentService.Delete(commentId);
+                var userGuid = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                if (userGuid == null)
+                    return Unauthorized();
+
+                if (User.IsInRole(RoleEnum.Admin.ToString()))
+                    await _ticketCommentService.Delete(commentId, new Guid(userGuid), RoleEnum.Admin);
+
+                if (User.IsInRole(RoleEnum.Moderator.ToString()))
+                    await _ticketCommentService.Delete(commentId, new Guid(userGuid), RoleEnum.Moderator);
+
+                if (User.IsInRole(RoleEnum.User.ToString()))
+                    await _ticketCommentService.Delete(commentId, new Guid(userGuid), RoleEnum.User);
+
                 return Ok();
             }
             catch (Exception ex)

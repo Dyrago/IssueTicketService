@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using IssueTicketService.Core.Enums;
 
 namespace IssueTicketService.Core.BusinessObjects
 {
@@ -6,7 +7,10 @@ namespace IssueTicketService.Core.BusinessObjects
     {
         [MaxLength(50)]
         public string? Contains { get; set; }
-        public DateTime? CreateDate { get; set; }
-        public Guid? UserId { get; set; } 
+        public DateTime? DateFrom { get; set; }
+        public DateTime? DateTo { get; set; }
+        public Guid? ResolverId { get; set; }
+        public Guid? ReporterId { get; set; }
+        public int? TicketStatusId { get; set; }
     }
 }

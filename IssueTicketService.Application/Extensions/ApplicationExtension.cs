@@ -1,3 +1,4 @@
+using IssueTicketService.Application.Services.Account;
 using IssueTicketService.Application.Services.Administration;
 using IssueTicketService.Application.Services.Authentication;
 using IssueTicketService.Application.Services.Role;
@@ -23,6 +24,7 @@ namespace IssueTicketService.Application.Extensions
             services.TryAddScoped<IUserRoleService, UserRoleService>();
             services.TryAddScoped<IAdministrationService, AdministrationService>();
             services.TryAddScoped<ITicketCommentService, TicketCommentService>();
+            services.TryAddScoped<IAccountService, AccountService>();
         }
     }
 }

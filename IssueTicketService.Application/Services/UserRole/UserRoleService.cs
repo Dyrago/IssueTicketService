@@ -19,9 +19,9 @@ namespace IssueTicketService.Application.Services.UserRole
             await _userRoleRepository.AddRoleToUser(userId, roleId);
         }
 
-        public Task RemoveRoleFromUser(Guid Id, int roleId)
+        public async Task RemoveRoleFromUser(Guid Id, int roleId)
         {
-            throw new NotImplementedException();
+            await _userRoleRepository.RemoveRoleFromUSer(Id, roleId);
         }
     }
 }

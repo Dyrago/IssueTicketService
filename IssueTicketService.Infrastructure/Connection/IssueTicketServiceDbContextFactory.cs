@@ -1,3 +1,4 @@
+using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
@@ -8,19 +9,23 @@ namespace IssueTicketService.Infrastructure.Connection
     {
         public IssueTicketServiceDbContext CreateDbContext(string[] args)
         {
-            var basePath = Path.Combine(Directory.GetCurrentDirectory(), "../IssueTicketService.Api");
+            Env.TraversePath().Load();   
+            
+            var host = Environment.GetEnvironmentVariable("POSTGRES_HOST");
+            var port = Environment.GetEnvironmentVariable("POSTGRES_PORT");
+            var dbName = Environment.GetEnvironmentVariable("POSTGRES_DB");
+            var user = Environment.GetEnvironmentVariable("POSTGRES_USER");
+            var pass = Environment.GetEnvironmentVariable("POSTGRES_PASSWORD");
 
-            var configuration = new ConfigurationBuilder()
-                .SetBasePath(basePath)
-                .AddJsonFile("appsettings.Development.json", optional: false, reloadOnChange: true)
-                .Build();
-
-            var connectionString = configuration.GetConnectionString("Default");
+            var connectionString = $"Host={host};Port={port};Database={dbName};Username={user};Password={pass};";
 
             var optionsBuilder = new DbContextOptionsBuilder<IssueTicketServiceDbContext>();
-            optionsBuilder.UseSqlite(connectionString);
+            optionsBuilder.UseNpgsql(connectionString);
 
             return new IssueTicketServiceDbContext(optionsBuilder.Options);
         }
     }
 }
+
+//Configuration above allows to use EF Core from class library
+// we separate EF Core configuration from API or so called startup project

@@ -22,9 +22,12 @@ namespace IssueTicketService.Infrastructure.Repositories.User
             return user.Id; 
         }
 
-        public Task Delete(int id)
+        public async Task Delete(Guid userId)
         {
-            throw new NotImplementedException();
+            using var dbContext = await _contextFactory.CreateDbContextAsync();
+            await dbContext.Users.Where(u => u.Id == userId).ExecuteDeleteAsync();
+
+            await dbContext.SaveChangesAsync();
         }
 
         public async Task<Core.Entities.User?> GetByEmail(string email)
@@ -49,7 +52,7 @@ namespace IssueTicketService.Infrastructure.Repositories.User
             return user;
         }
 
-        public Task Update(int id, Core.Entities.User ticket)
+        public Task Update(Guid id, Core.Entities.User user)
         {
             throw new NotImplementedException();
         }

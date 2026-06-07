@@ -33,9 +33,23 @@ namespace IssueTicketService.Infrastructure.Repositories.UserRoles
             await dbContext.SaveChangesAsync();
         }
 
-        public Task RemoveRoleFromUSer(Guid userId, int roleId)
+        public async Task RemoveRoleFromUSer(Guid userId, int roleId)
         {
-            throw new NotImplementedException();
+            using var dbContext = await _dbContextFactory.CreateDbContextAsync();
+            var user = await dbContext.Users.Where(u => u.Id == userId)
+                                            .Include(r => r.Roles)
+                                            .FirstAsync();
+
+            if (user == null)
+                return;
+
+            var role = await dbContext.Roles.Where(r => r.Id == roleId).FirstAsync();
+
+            if (role == null)
+                return;
+
+            user.Roles.Remove(role);
+            await dbContext.SaveChangesAsync();
         }
     }
 }

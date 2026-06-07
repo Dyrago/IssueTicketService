@@ -2,6 +2,7 @@ using System.Security.Claims;
 using IssueTicketService.Application.Dto.Ticket;
 using IssueTicketService.Application.Services.Ticket;
 using IssueTicketService.Core.BusinessObjects;
+using IssueTicketService.Core.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,15 +27,27 @@ namespace IssueTicketService.Api.Controllers
         {
             try
             {
-                var userGuid = User.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier)?.FirstOrDefault()?.Value;
+                var userGuid = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
                 if (userGuid == null)
                     return Unauthorized();
 
-                if (!User.IsInRole("Admin") || !User.IsInRole("Mod"))
-                    filter.UserId = new Guid(userGuid);
+                if (User.IsInRole(RoleEnum.Admin.ToString()))
+                {
+                   return Ok(await _ticketService.Search(filter));
+                }
 
-                return new JsonResult(await _ticketService.Search(filter));
+                if (User.IsInRole(RoleEnum.Moderator.ToString()))
+                {
+                    filter.ResolverId = new Guid(userGuid);
+
+                    return Ok(await _ticketService.Search(filter));
+                }
+
+                if (!User.IsInRole(RoleEnum.Admin.ToString()) || !User.IsInRole(RoleEnum.Moderator.ToString()))
+                    filter.ReporterId = new Guid(userGuid);
+
+                return Ok(await _ticketService.Search(filter));
             }
             catch (Exception ex)
             {
@@ -48,7 +61,21 @@ namespace IssueTicketService.Api.Controllers
         {
             try
             {
-                return new JsonResult(await _ticketService.GetById(id));
+                var userGuid = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                if (userGuid == null)
+                    return Unauthorized();
+
+                if(User.IsInRole(RoleEnum.Admin.ToString()) || User.IsInRole(RoleEnum.Moderator.ToString()))
+                {
+                    var ticket = await _ticketService.GetById(id);
+                    return ticket != null ? Ok(ticket) : NotFound();
+                }
+                else
+                {
+                    var ticket = await _ticketService.GetById(id, new Guid(userGuid));
+                    return ticket != null ? Ok(ticket) : NotFound();
+                }
             }
             catch (Exception ex)
             {
@@ -65,7 +92,7 @@ namespace IssueTicketService.Api.Controllers
             {
                 await _ticketService.ChangeStatus(id, statusId);
 
-                return new JsonResult(new { Data = "Status changed successfuly." });
+                return Ok(new { Data = "Status changed successfuly." });
             }
             catch (Exception ex)
             {
@@ -74,12 +101,13 @@ namespace IssueTicketService.Api.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin,Mod")]
         [HttpGet("Tickets/User/{guid}")]
         public async Task<IActionResult> GetById(string guid)
         {
             try
             {
-                return new JsonResult(await _ticketService.GetByUserId(new Guid(guid)));
+                return Ok(await _ticketService.GetByUserId(new Guid(guid)));
             }
             catch (Exception ex)
             {
@@ -93,7 +121,16 @@ namespace IssueTicketService.Api.Controllers
         {
             try
             {
-                await _ticketService.Update(id, ticket);
+                var userGuid = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                if (userGuid == null)
+                    return Unauthorized();
+
+                if(User.IsInRole(RoleEnum.Admin.ToString()) || User.IsInRole(RoleEnum.Moderator.ToString()))
+                    await _ticketService.Update(id, ticket);
+                else
+                    await _ticketService.Update(id, ticket, new Guid(userGuid));
+
                 return Ok();
             }
             catch (Exception ex)
@@ -108,7 +145,15 @@ namespace IssueTicketService.Api.Controllers
         {
             try
             {
-                await _ticketService.Delete(id);
+                 var userGuid = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                if (userGuid == null)
+                    return Unauthorized();
+
+                if(User.IsInRole(RoleEnum.Admin.ToString()) || User.IsInRole(RoleEnum.Moderator.ToString()))
+                    await _ticketService.Delete(id);
+                else
+                    await _ticketService.Delete(id, new Guid(userGuid));
                 return Ok();
             }
             catch (Exception ex)
@@ -124,7 +169,7 @@ namespace IssueTicketService.Api.Controllers
         {
             try
             {
-                var userGuid = User.Claims.Where(c => c.Type == ClaimTypes.NameIdentifier).First().Value;
+                var userGuid = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
                 if (userGuid == null)
                     return Unauthorized();

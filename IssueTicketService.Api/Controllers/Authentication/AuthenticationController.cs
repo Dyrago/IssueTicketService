@@ -1,11 +1,12 @@
 using System.Net;
 using IssueTicketService.Application.Dto.Authentication;
 using IssueTicketService.Application.Services.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IssueTicketService.Api.Controllers.Authentication
 {
-    public class AuthenticationController : Controller
+    public class AuthenticationController : ControllerBase
     {
         private readonly ILogger<AuthenticationController> _logger;
         private readonly IAuthenticationService _authenticationService;
@@ -27,15 +28,7 @@ namespace IssueTicketService.Api.Controllers.Authentication
                 if (token == null)
                     return StatusCode(500);
 
-                Response.Cookies.Append("RfsTkn", token.RefreshToken, new CookieOptions()
-                {
-                    SameSite = SameSiteMode.Strict,
-                    HttpOnly = true,
-                    Secure = true,
-                    Expires = DateTime.Now.AddHours(1)
-                });
-
-                return new JsonResult(token.AuthToken);
+                return Ok(new { Data = token});
             }
             catch (Exception ex)
             {
@@ -50,7 +43,29 @@ namespace IssueTicketService.Api.Controllers.Authentication
             try
             {
                 var newUserId = await _authenticationService.Register(register);
-                return new JsonResult(newUserId);
+                return Ok(newUserId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return StatusCode(500);
+            }
+        }
+
+        [HttpPost("Authentication/Refresh")]
+        public async Task<IActionResult> Refresh()
+        {
+            try
+            {
+                if (!Request.Cookies.TryGetValue("RfsTkn", out var refreshToken))
+                {
+                    return Unauthorized("Refresh token is missing.");
+                }
+
+                //Call to service that will verify old token and will return new pair of tokens
+
+                //Return new access token and refresh token in response
+                return Ok();
             }
             catch (Exception ex)
             {

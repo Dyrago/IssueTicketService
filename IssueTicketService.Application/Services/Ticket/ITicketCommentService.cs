@@ -1,13 +1,13 @@
 using IssueTicketService.Application.Dto.Ticket;
+using IssueTicketService.Core.Enums;
 
 namespace IssueTicketService.Application.Services.Ticket
 {
     public interface ITicketCommentService
     {
-        Task<TicketCommentDto?> Get(int id);
-        Task Create(TicketCommentCreateDto comment, Guid userId);
-        Task<TicketCommentSearchResultDto> Search(int ticketId, int page, int size);
-        Task Delete(int id);
-        Task Edit(int id, Core.Entities.Comment comment);
+        Task Create(TicketCommentCreateDto comment, Guid userId, RoleEnum userRole);
+        Task<TicketCommentSearchResultDto> Search(TicketCommentsSearchFilter filter, Guid userId, RoleEnum userRole);
+        Task Delete(int id, Guid? userId, RoleEnum userRole);
+        Task Edit(TicketCommentEditDto comment, Guid userId, RoleEnum userRole);
     }
 }

@@ -5,7 +5,7 @@ namespace IssueTicketService.Core.Repositories
         Task<Entities.User?> GetById(Guid id);
         Task<Entities.User?> GetByEmail(string email);
         Task<Guid> Create(Entities.User user);
-        Task Update(int id, Entities.User ticket);
-        Task Delete(int id);
+        Task Update(Guid id, Entities.User user);
+        Task Delete(Guid id);
     }
 }

@@ -1,3 +1,5 @@
+using IssueTicketService.Core.Entities;
+
 namespace IssueTicketService.Application.Dto.Ticket
 {
     public class TicketCommentSearchResultDto

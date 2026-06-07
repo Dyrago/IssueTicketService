@@ -1,6 +1,7 @@
 using IssueTicketService.Application.Dto.Ticket;
 using IssueTicketService.Application.Services.User;
 using IssueTicketService.Core.BusinessObjects;
+using IssueTicketService.Core.Enums;
 using IssueTicketService.Core.Repositories;
 
 namespace IssueTicketService.Application.Services.Ticket
@@ -30,9 +31,9 @@ namespace IssueTicketService.Application.Services.Ticket
             await _ticketRepository.Create(ticket);
         }
 
-        public async Task Delete(int id)
+        public async Task Delete(int id, Guid? userId = null)
         {
-            await _ticketRepository.Delete(id);
+            await _ticketRepository.Delete(id, userId);
         }
 
         public async Task<IEnumerable<TicketResponseDto>> Search(TicketSearchFilter filter)
@@ -42,9 +43,12 @@ namespace IssueTicketService.Application.Services.Ticket
             return tickets.Select(t => new TicketResponseDto(t));
         }
 
-        public async Task<TicketResponseDto> GetById(int id)
+        public async Task<TicketResponseDto?> GetById(int id, Guid? userId = null)
         {
-            var ticket = await _ticketRepository.GetById(id);
+            var ticket = await _ticketRepository.GetById(id, userId);
+
+            if (ticket == null)
+                throw new Exception("Resource not avialable.");
 
             return new TicketResponseDto(ticket);
         }
@@ -56,7 +60,7 @@ namespace IssueTicketService.Application.Services.Ticket
             return tickets.Select(t => new TicketResponseDto(t));
         }
 
-        public async Task Update(int id, TicketRequestDto dto)
+        public async Task Update(int id, TicketRequestDto dto, Guid? userId = null)
         {
             var ticket = new Core.Entities.Ticket()
             {
@@ -64,7 +68,7 @@ namespace IssueTicketService.Application.Services.Ticket
                 Content = dto.Content
             };
 
-            await _ticketRepository.Update(id, ticket);
+            await _ticketRepository.Update(id, ticket, userId);
         }
 
         public async Task ChangeStatus(int taskId, int statusId)

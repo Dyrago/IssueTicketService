@@ -1,7 +1,9 @@
+using IssueTicketService.Core.Entities;
+
 namespace IssueTicketService.Core.Repositories
 {
     public interface ITokenRepository
     {
-        Task SaveRefreshToken(string refreshToken, Guid userId);
+        Task SaveRefreshToken(RefreshToken refreshToken);
     }
 }

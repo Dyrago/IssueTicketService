@@ -22,10 +22,10 @@ namespace IssueTicketService.Infrastructure.Repositories.Ticket
             await context.SaveChangesAsync();
         }
 
-        public async Task Delete(int id)
+        public async Task Delete(int id, Guid? userId = null)
         {
             using var context = _contextFactory.CreateDbContext();
-            await context.Tickets.Where(t => t.Id == id).ExecuteDeleteAsync();
+            await context.Tickets.Where(t => t.Id == id && t.ReporterId == userId).ExecuteDeleteAsync();
 
             await context.SaveChangesAsync();
         }
@@ -36,24 +36,34 @@ namespace IssueTicketService.Infrastructure.Repositories.Ticket
 
             var query = context.Tickets.AsQueryable();
 
-            if (filter.UserId.HasValue)
-                query = query.Where(t => t.ReporterId == filter.UserId);
+            if (filter.ReporterId.HasValue)
+                query = query.Where(t => t.ReporterId == filter.ReporterId);
+
+            if (filter.ResolverId.HasValue)
+                query = query.Where(t => t.ResolverId == filter.ResolverId || t.ResolverId == null);
+
+            if (filter.TicketStatusId.HasValue)
+                query = query.Where(t => Convert.ToInt32(t.Status) == filter.TicketStatusId);
 
             if (!string.IsNullOrEmpty(filter.Contains))
                 query = query.Where(t => t.Content.Contains(filter.Contains) || t.Title.Contains(filter.Contains));
 
-            if (filter.CreateDate.HasValue)
-                query = query.Where(t => t.CreateDate == filter.CreateDate);          
+            if (filter.DateFrom.HasValue)
+                query = query.Where(t => t.CreateDate >= filter.DateFrom);          
+
+            if (filter.DateTo.HasValue)
+                query = query.Where(t => t.CreateDate <= filter.DateTo);          
+
 
             var tickets = await query.ToListAsync();
 
             return tickets;
         }
 
-        public async Task<Core.Entities.Ticket?> GetById(int id)
+        public async Task<Core.Entities.Ticket?> GetById(int id, Guid? userId)
         {
             using var context = _contextFactory.CreateDbContext();
-            var ticket = await context.Tickets.Where(t => t.Id == id).FirstOrDefaultAsync();
+            var ticket = await context.Tickets.Where(t => t.Id == id && t.ReporterId == userId).FirstOrDefaultAsync();
 
             return ticket;
         }
@@ -66,12 +76,12 @@ namespace IssueTicketService.Infrastructure.Repositories.Ticket
             return tickets;
         }
 
-        public async Task Update(int id, Core.Entities.Ticket ticket)
+        public async Task Update(int id, Core.Entities.Ticket ticket, Guid? userId = null)
         {
             using var context = _contextFactory.CreateDbContext();
-            await context.Tickets.Where(t => t.Id == id)
+            await context.Tickets.Where(t => t.Id == id && t.ReporterId == userId)
                                  .ExecuteUpdateAsync(t => t.SetProperty(t => t.Title, ticket.Title)
-                                                                                  .SetProperty(t => t.Content, ticket.Content));
+                                                            .SetProperty(t => t.Content, ticket.Content));
 
             await context.SaveChangesAsync();
         }

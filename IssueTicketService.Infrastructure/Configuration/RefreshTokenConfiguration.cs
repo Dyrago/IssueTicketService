@@ -12,8 +12,7 @@ namespace IssueTicketService.Infrastructure.Configuration
 
             builder.HasOne(t => t.User)
             .WithMany(u => u.RefreshTokens)
-            .HasForeignKey(t => t.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .HasForeignKey(t => t.UserId);
         }
     }
 }

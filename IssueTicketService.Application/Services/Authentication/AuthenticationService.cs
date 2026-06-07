@@ -40,10 +40,10 @@ namespace IssueTicketService.Application.Services.Authentication
             if (register == null)
                 return null;
 
-            if (register.Password != register.RepetePassword)
+            if (register.Password != register.RepeatPassword)
                 return null;
 
-            var passwordResult = Application.Services.PasswordService.PasswordService.HashPassword(register.Password);
+            var passwordResult = PasswordService.PasswordService.HashPassword(register.Password);
 
             if (passwordResult == null ||
                 passwordResult.Password == null ||

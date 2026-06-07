@@ -19,6 +19,7 @@ namespace IssueTicketService.Core.Entities
             ReportedTickets = new List<Ticket>();
             ResolvedTickets = new List<Ticket>();
             RefreshTokens = new List<RefreshToken>();
+            Comments = new List<Comment>();
         }
     }
 }

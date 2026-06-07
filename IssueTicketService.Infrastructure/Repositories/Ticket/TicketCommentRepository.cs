@@ -1,4 +1,3 @@
-using IssueTicketService.Application.Dto.Ticket;
 using IssueTicketService.Core.Entities;
 using IssueTicketService.Core.Repositories;
 using IssueTicketService.Infrastructure.Connection;
@@ -31,25 +30,34 @@ namespace IssueTicketService.Infrastructure.Repositories.Ticket
             await context.SaveChangesAsync();
         }
 
-        public Task Edit(int id, Comment comment)
+        public async Task Edit(int id, string content)
         {
-            throw new NotImplementedException();
+            var context = await _contextFactory.CreateDbContextAsync();
+
+            await context.Comments.Where(c => c.Id == id)
+                                  .ExecuteUpdateAsync(c => c.SetProperty(c => c.Content, content)); 
+
+            await context.SaveChangesAsync();
         }
 
         public async Task<(IEnumerable<Comment>, int)> Search(int ticketId, int page, int size)
         {
             var context = await _contextFactory.CreateDbContextAsync();
-            var totalRowsCount = await context.Comments.Where(c => c.TicketId == ticketId).CountAsync();
 
-            var comments = await context.Comments
+            var query = context.Comments
+            .AsNoTracking()
+            .Where(c => c.TicketId == ticketId);
+
+            var totalRowsCount = await query.CountAsync();
+
+            var comments = await query
             .Include(c => c.User)
-            .Where(c => c.TicketId == ticketId)
             .OrderByDescending(c => c.Id)
             .Skip(page * size)
             .Take(size)
             .ToListAsync();
 
-            return (comments, totalRowsCount);
+            return new (comments, totalRowsCount);
         }
 
         public async Task<Comment?> Get(int id)

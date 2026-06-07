@@ -16,6 +16,6 @@ namespace IssueTicketService.Application.Dto.Authentication
         [Required]
         [MinLength(8)]
         [MaxLength(40)]
-        public string RepetePassword { get; set; }
+        public string RepeatPassword { get; set; }
     }
 }
