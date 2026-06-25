@@ -32,7 +32,7 @@ namespace IssueTicketService.Application.Services.Authentication
             if (user == null)
                 return null;
 
-            return _tokenService.Create(user);
+            return await _tokenService.Create(user);
         }
 
         public async Task<Guid?> Register(RegisterUserDto register)
@@ -60,6 +60,11 @@ namespace IssueTicketService.Application.Services.Authentication
             await _userRoleService.AddRoleToUser(newUserId, (int)RoleEnum.User); 
 
             return newUserId;
+        }
+
+        public async Task<TokenResult> RefreshAccess(RefreshDataDto dto)
+        {
+            return await _tokenService.Refresh(dto);
         }
     }
 }

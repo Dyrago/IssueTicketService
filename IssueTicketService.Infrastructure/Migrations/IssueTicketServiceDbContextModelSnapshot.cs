@@ -17,7 +17,7 @@ namespace IssueTicketService.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.26")
+                .HasAnnotation("ProductVersion", "8.0.28")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -64,6 +64,12 @@ namespace IssueTicketService.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("Expires")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsRevoked")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("RevokeDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("TokenValue")
@@ -128,11 +134,21 @@ namespace IssueTicketService.Infrastructure.Migrations
                     b.Property<string>("Title")
                         .HasColumnType("text");
 
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("UserId1")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ReporterId");
 
                     b.HasIndex("ResolverId");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("UserId1");
 
                     b.ToTable("Tickets");
                 });
@@ -211,15 +227,22 @@ namespace IssueTicketService.Infrastructure.Migrations
             modelBuilder.Entity("IssueTicketService.Core.Entities.Ticket", b =>
                 {
                     b.HasOne("IssueTicketService.Core.Entities.User", "Reporter")
-                        .WithMany("ReportedTickets")
+                        .WithMany()
                         .HasForeignKey("ReporterId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("IssueTicketService.Core.Entities.User", "Resolver")
+                        .WithMany()
+                        .HasForeignKey("ResolverId");
+
+                    b.HasOne("IssueTicketService.Core.Entities.User", null)
+                        .WithMany("ReportedTickets")
+                        .HasForeignKey("UserId");
+
+                    b.HasOne("IssueTicketService.Core.Entities.User", null)
                         .WithMany("ResolvedTickets")
-                        .HasForeignKey("ResolverId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("UserId1");
 
                     b.Navigation("Reporter");
 

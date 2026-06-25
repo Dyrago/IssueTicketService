@@ -53,7 +53,7 @@ namespace IssueTicketService.Api.Controllers.Authentication
         }
 
         [HttpPost("Authentication/Refresh")]
-        public async Task<IActionResult> Refresh()
+        public async Task<IActionResult> Refresh(RefreshDataDto dto)
         {
             try
             {
@@ -62,10 +62,11 @@ namespace IssueTicketService.Api.Controllers.Authentication
                     return Unauthorized("Refresh token is missing.");
                 }
 
-                //Call to service that will verify old token and will return new pair of tokens
+                var uc = User.Claims;
+                
+                var result = await _authenticationService.RefreshAccess(dto);
 
-                //Return new access token and refresh token in response
-                return Ok();
+                return Ok(result);
             }
             catch (Exception ex)
             {

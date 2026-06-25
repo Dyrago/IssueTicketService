@@ -6,5 +6,6 @@ namespace IssueTicketService.Application.Services.Token
     {
         public string GenerateToken(ClaimsIdentity userClaims);
         public string GenerateRefreshToken();
+        public Task<ClaimsPrincipal> GetClaimsFromExpiredToken(string accessToken);
     }
 }

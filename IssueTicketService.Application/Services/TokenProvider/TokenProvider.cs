@@ -16,11 +16,10 @@ namespace IssueTicketService.Application.Services.Token
 
         public string GenerateToken(ClaimsIdentity userClaims)
         {
-            //TODO: Change _config to Options Pattern
             string secretKey = _config["Jwt:Secret"]!;
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
 
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
+            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var tokenDescriptor = new SecurityTokenDescriptor()
             {
@@ -45,6 +44,36 @@ namespace IssueTicketService.Application.Services.Token
                 rng.GetBytes(randomBytes);
             }
             return Convert.ToBase64String(randomBytes);
+        }
+
+        public async Task<ClaimsPrincipal> GetClaimsFromExpiredToken(string accessToken)
+        {
+            var handler = new JsonWebTokenHandler();
+
+            string secretKey = _config["Jwt:Secret"]!;
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+
+            var validationParams = new TokenValidationParameters()
+            {
+                ValidateIssuer = false, 
+                ValidateAudience = false,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = securityKey,
+ 
+                ValidateLifetime = false
+            };
+            
+            var validToken = await handler.ValidateTokenAsync(accessToken, validationParams);
+
+            if (!validToken.IsValid)
+                throw new Exception("Invalid token.");
+
+            var jwt = validToken.SecurityToken as JsonWebToken;
+
+            if (jwt == null || !string.Equals(jwt.Alg, SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+                throw new Exception("Invalid token.");
+
+            return new ClaimsPrincipal(validToken.ClaimsIdentity);
         }
     }
 }

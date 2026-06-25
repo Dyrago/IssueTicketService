@@ -1,10 +1,11 @@
+using IssueTicketService.Application.Dto.Authentication;
 using IssueTicketService.Application.Dto.Token;
 
 namespace IssueTicketService.Application.Services.Token
 {
     public interface ITokenService
     {
-        TokenResult Create(Core.Entities.User user);
-        TokenResult Refresh();
+        Task<TokenResult> Create(Core.Entities.User user);
+        Task<TokenResult> Refresh(RefreshDataDto dto);
     }
 }
