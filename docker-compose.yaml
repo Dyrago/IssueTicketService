@@ -61,6 +61,7 @@ services:
     environment:
         - NODE_ENV=production
         - PORT=3000
+        - ORIGIN=http://localhost:3000
         - BACKEND_INTERNAL_URL=http://api:8080 #Instruuje frontend do jakiej usługi i na jaki port wysyłać zapytania poprzez wewnętrzną sieć docker
     depends_on:
         - api

@@ -40,7 +40,7 @@ export const actions = {
 					sameSite: 'strict',
 					maxAge: 60 * 5
 				});
-                cookies.set('session', result.token, {
+                cookies.set('RfsTkn', result.token, {
 					path: '/',
 					httpOnly: true,
 					sameSite: 'strict',

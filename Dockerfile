@@ -17,7 +17,7 @@ COPY ["IssueTicketService.Infrastructure/IssueTicketService.Infrastructure.cspro
 RUN dotnet restore "IssueTicketService.Api/IssueTicketService.Api.csproj"
 
 #Dla Modular Monolith
-# Kopiujemy strukturę i zostawiamy tylko pliki projektów oraz solucję
+# Kopiujemy strukturę i zostawiamy tylko pliki projektów oraz solucjęa
 #COPY . .
 #RUN find . -type f -not -name '*.csproj' -not -name '*.sln' -delete
 

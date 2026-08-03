@@ -4,15 +4,26 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-    {
-        "name": "Containers .NET Attach (Preview)",
-        "type": "docker",
-        "request": "attach",
-        "platform": "netCore",
-        "sourceFileMap": {
-            "/src": "${workspaceFolder}"
-        }
-    },        
+        {
+      "name": "Attach do .NET w Dockerze",
+      "type": "coreclr",
+      "request": "attach",
+      "processId": "${command:pickRemoteProcess}",
+      "pipeTransport": {
+        "pipeProgram": "docker",
+        "pipeArgs": [
+          "exec",
+          "-i",
+          "issue-ticket-service-api"
+        ],
+        "debuggerPath": "/vsdbg/vsdbg",
+        "pipeCwd": "${workspaceFolder}"
+      },
+      "sourceFileMap": {
+        "/WebApp": "${workspaceFolder}",
+        "/IssueTicketService": "${workspaceFolder}"
+      }
+    },
         {
             "name": ".NET Core Launch (web)",
             "type": "coreclr",
