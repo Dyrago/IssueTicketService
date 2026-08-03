@@ -17,7 +17,7 @@ namespace IssueTicketService.Infrastructure.Repositories.Administration
 
         public async Task<(IEnumerable<EmployeeDto>, int)> EmployeeSearch(EmployeeSearchFilter filter)
         {
-            var connection = await _dbContextFactory.CreateDbContextAsync();
+            using var connection = await _dbContextFactory.CreateDbContextAsync();
 
             var query = connection.Users.Where(u => u.Roles.Any(r => r.Id == (int)RoleEnum.Moderator));
 
@@ -34,7 +34,7 @@ namespace IssueTicketService.Infrastructure.Repositories.Administration
 
         public async Task<EmployeeViewDto> GetEmployee(Guid userId)
         {
-            var connection = await _dbContextFactory.CreateDbContextAsync();
+            using var connection = await _dbContextFactory.CreateDbContextAsync();
 
             var employeeView = await connection.Users
             .Where(u => u.Id == userId)

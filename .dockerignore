@@ -1,0 +1,24 @@
+# Śmieci kompilacji .NET
+**/bin/
+**/obj/
+
+# Konfiguracja IDE i edytorów
+.vs/
+.vscode/
+.rider/
+*.user
+*.suo
+*.sln.docstates
+
+# Systemowe pliki tymczasowe
+.DS_Store
+Thumbs.db
+
+# Kontrola wersji i Docker
+.git/
+.gitignore
+*.yaml
+*.yml
+
+# KLUCZOWE: Ignorujemy cały folder frontendowy w kontekście backendu ze względu na strukturę folderów, omijamy go aby nie został załadowany
+www/

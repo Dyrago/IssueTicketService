@@ -5,6 +5,9 @@ using System.Text;
 using IssueTicketService.Application.Extensions;
 using IssueTicketService.Infrastructure.Extensions;
 using System.Security.Claims;
+using IssueTicketService.Infrastructure.Seeder;
+using IssueTicketService.Infrastructure.Connection;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -86,6 +89,25 @@ builder.Services.AddAuthentication(options => {
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var contextFactory = services.GetRequiredService<IDbContextFactory<IssueTicketServiceDbContext>>();
+        
+        using var context = contextFactory.CreateDbContext();
+
+        context.Database.Migrate();
+
+        TicketsDbSeeder.Seed(context);
+    }
+    catch (Exception ex)
+    {
+        Log.Error(ex, "Wystąpił błąd podczas aplikowania migracji lub seedowania bazy danych.");
+    }
+}
 
 if (app.Environment.IsDevelopment())
 {

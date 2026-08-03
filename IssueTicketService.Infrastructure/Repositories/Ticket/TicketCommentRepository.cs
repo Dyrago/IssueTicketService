@@ -42,7 +42,7 @@ namespace IssueTicketService.Infrastructure.Repositories.Ticket
 
         public async Task<(IEnumerable<Comment>, int)> Search(int ticketId, int page, int size)
         {
-            var context = await _contextFactory.CreateDbContextAsync();
+            using var context = await _contextFactory.CreateDbContextAsync();
 
             var query = context.Comments
             .AsNoTracking()

@@ -20,7 +20,14 @@ namespace IssueTicketService.Infrastructure.Connection
             var connectionString = $"Host={host};Port={port};Database={dbName};Username={user};Password={pass};";
 
             var optionsBuilder = new DbContextOptionsBuilder<IssueTicketServiceDbContext>();
-            optionsBuilder.UseNpgsql(connectionString);
+            optionsBuilder.UseNpgsql(connectionString, opt =>
+            {
+                opt.EnableRetryOnFailure(
+                    maxRetryCount: 5,
+                    maxRetryDelay: TimeSpan.FromSeconds(5),
+                    errorCodesToAdd: null
+                );
+            });
 
             return new IssueTicketServiceDbContext(optionsBuilder.Options);
         }

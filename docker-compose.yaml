@@ -1,0 +1,79 @@
+services:
+
+  postgres:
+    container_name: issue-ticket-service-db
+    image: postgres:18.1
+    restart: unless-stopped
+    networks:
+      - app-network
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1024M
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: issue-ticket-service-api
+    restart: unless-stopped
+    networks:
+      - app-network
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080 #Mówi .NETowi na jakim porcie nasłuchiwać komunikacji, https jest zbędny w wewnętrznej komunikacji sieciowej między kontenerami. symbol + pozwala na przyjmowanie komunikacji spoza kontenera
+      - ConnectionStrings__DefaultConnection=Host=postgres;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      - Jwt__Secret=${JWT_SECRET} #ten zapis podmienia nam zmienne z konfiguracji, które wymagane byłby z appesttings 
+      - Jwt__Issuer=${PRODUCTION_URL}
+      - Jwt__Audience=${PRODUCTION_URL}
+      - Jwt__ExpirationInMinutes=${JWT_LIFETIME}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+
+  sveltekit:
+    build:
+      context: ./www
+      dockerfile: Dockerfile
+    container_name: issue-ticket-service-frontend
+    restart: unless-stopped
+    networks: 
+      - app-network
+    ports:
+      - "3000:3000"
+    environment:
+        - NODE_ENV=production
+        - PORT=3000
+        - BACKEND_INTERNAL_URL=http://api:8080 #Instruuje frontend do jakiej usługi i na jaki port wysyłać zapytania poprzez wewnętrzną sieć docker
+    depends_on:
+        - api
+    deploy:
+      resources:
+        limits:
+            cpus: '0.5'
+            memory: 256M
+  
+
+volumes:
+  postgres_data:
+
+networks:
+  app-network:
+    driver: bridge 

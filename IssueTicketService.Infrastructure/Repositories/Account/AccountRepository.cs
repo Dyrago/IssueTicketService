@@ -14,7 +14,7 @@ namespace IssueTicketService.Infrastructure.Repositories.Account
 
         public async Task ChangePassword(Guid userId, string newPasswordHash, string salt)
         {
-            var connection = await _dbContextFactory.CreateDbContextAsync();
+            using var connection = await _dbContextFactory.CreateDbContextAsync();
 
             await connection.Users.Where(u => u.Id == userId)
             .ExecuteUpdateAsync(u => u.SetProperty(u => u.Password, newPasswordHash)
@@ -25,7 +25,7 @@ namespace IssueTicketService.Infrastructure.Repositories.Account
 
         public async Task Delete(Guid userId)
         {
-            var connection = await _dbContextFactory.CreateDbContextAsync();
+            using var connection = await _dbContextFactory.CreateDbContextAsync();
 
             await connection.Users.Where(u => u.Id == userId).ExecuteDeleteAsync();
         }

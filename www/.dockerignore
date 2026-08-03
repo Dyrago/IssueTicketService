@@ -1,0 +1,23 @@
+# Zależności i lokalne buildy (kontener zbuduje własne)
+node_modules/
+.svelte-kit/
+build/
+.vercel/
+.netlify/
+
+# Lokalne pliki konfiguracyjne środowiska (zapobiega wyciekowi sekretów)
+.env
+.env.*
+!.env.example
+
+# Logi błędów npm/yarn
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Konfiguracja edytorów i OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

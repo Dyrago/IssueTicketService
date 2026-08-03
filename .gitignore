@@ -12,6 +12,8 @@
 *.user
 *.userosscache
 *.sln.docstates
+*.override.yaml
+*.override.yml
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
