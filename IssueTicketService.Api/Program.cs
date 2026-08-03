@@ -88,6 +88,7 @@ builder.Services.AddAuthentication(options => {
 });
 builder.Services.AddAuthorization();
 
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -99,6 +100,14 @@ using (var scope = app.Services.CreateScope())
         
         using var context = contextFactory.CreateDbContext();
 
+        var allMigrations = context.Database.GetMigrations();
+var pendingMigrations = context.Database.GetPendingMigrations();
+
+Console.WriteLine($"==================================================");
+Console.WriteLine($"[EF DEBUG] Wszystkie wykryte migracje w dll: {allMigrations.Count()}");
+Console.WriteLine($"[EF DEBUG] Niewykonane migracje (Pending): {pendingMigrations.Count()}");
+Console.WriteLine($"==================================================");
+
         context.Database.Migrate();
 
         TicketsDbSeeder.Seed(context);
@@ -106,6 +115,7 @@ using (var scope = app.Services.CreateScope())
     catch (Exception ex)
     {
         Log.Error(ex, "Wystąpił błąd podczas aplikowania migracji lub seedowania bazy danych.");
+        throw;
     }
 }
 

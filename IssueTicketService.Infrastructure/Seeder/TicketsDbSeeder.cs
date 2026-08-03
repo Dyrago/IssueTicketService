@@ -18,13 +18,14 @@ namespace IssueTicketService.Infrastructure.Seeder
                     Email = "admin@tickets.com",
                     Password = adminPasswordResult.Password,
                     Salt = adminPasswordResult.Salt,
-                    CreateDate = DateTime.Now,
+                    CreateDate = DateTime.UtcNow,
                     Roles = new List<Role>()
                     {
                         new Role()
                         {
                             Id = (int)RoleEnum.Admin,
-                            Name = "Admin"
+                            Name = "Admin",
+                            Description = string.Empty
                         }
                     }
                 };
@@ -38,13 +39,14 @@ namespace IssueTicketService.Infrastructure.Seeder
                     Email = "mod@tickets.com",
                     Password = modPasswordResult.Password,
                     Salt = modPasswordResult.Salt,
-                    CreateDate = DateTime.Now,
+                    CreateDate = DateTime.UtcNow,
                     Roles = new List<Role>()
                     {
                         new Role()
                         {
                             Id = (int)RoleEnum.Moderator,
-                            Name = "Mod"
+                            Name = "Mod",
+                            Description = string.Empty
                         }
                     }
                 };
@@ -58,13 +60,14 @@ namespace IssueTicketService.Infrastructure.Seeder
                     Email = "user@tickets.com",
                     Password = userPasswordResult.Password,
                     Salt = userPasswordResult.Salt,
-                    CreateDate = DateTime.Now,
+                    CreateDate = DateTime.UtcNow,
                     Roles = new List<Role>()
                     {
                         new Role()
                         {
                             Id = (int)RoleEnum.User,
-                            Name = "User"
+                            Name = "User",
+                            Description = string.Empty
                         }
                     }
                 };

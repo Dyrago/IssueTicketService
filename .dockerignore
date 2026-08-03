@@ -22,3 +22,5 @@ Thumbs.db
 
 # KLUCZOWE: Ignorujemy cały folder frontendowy w kontekście backendu ze względu na strukturę folderów, omijamy go aby nie został załadowany
 www/
+
+.env

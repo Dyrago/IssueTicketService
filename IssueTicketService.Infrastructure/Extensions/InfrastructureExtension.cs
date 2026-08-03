@@ -7,6 +7,7 @@ using IssueTicketService.Infrastructure.Repositories.Role;
 using IssueTicketService.Infrastructure.Repositories.Ticket;
 using IssueTicketService.Infrastructure.Repositories.User;
 using IssueTicketService.Infrastructure.Repositories.UserRoles;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -17,7 +18,20 @@ namespace IssueTicketService.Infrastructure.Extensions
     {
         public static void AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddDbContextFactory<IssueTicketServiceDbContext>();
+            var connectionString = configuration.GetConnectionString("DefaultConnection");
+
+            services.AddDbContextFactory<IssueTicketServiceDbContext>(options =>
+{
+    options.UseNpgsql(connectionString, opt =>
+    {
+        opt.EnableRetryOnFailure(
+            maxRetryCount: 5,
+            maxRetryDelay: TimeSpan.FromSeconds(5),
+            errorCodesToAdd: null
+        );
+        opt.MigrationsAssembly(typeof(IssueTicketServiceDbContext).Assembly.GetName().Name);
+    });
+});
 
             services.TryAddScoped<ITicketRepository, TicketRepository>();
             services.TryAddScoped<IUserRepository, UserRepository>();

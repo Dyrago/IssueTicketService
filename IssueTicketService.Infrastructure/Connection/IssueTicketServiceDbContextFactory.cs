@@ -9,15 +9,24 @@ namespace IssueTicketService.Infrastructure.Connection
     {
         public IssueTicketServiceDbContext CreateDbContext(string[] args)
         {
-            Env.TraversePath().Load();   
-            
-            var host = Environment.GetEnvironmentVariable("POSTGRES_HOST");
-            var port = Environment.GetEnvironmentVariable("POSTGRES_PORT");
-            var dbName = Environment.GetEnvironmentVariable("POSTGRES_DB");
-            var user = Environment.GetEnvironmentVariable("POSTGRES_USER");
-            var pass = Environment.GetEnvironmentVariable("POSTGRES_PASSWORD");
+           if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable("POSTGRES_HOST")) &&
+                string.IsNullOrEmpty(Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")))
+            {
+                Env.TraversePath().Load();
+            }
 
-            var connectionString = $"Host={host};Port={port};Database={dbName};Username={user};Password={pass};";
+            var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection");
+
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                var host = Environment.GetEnvironmentVariable("POSTGRES_HOST") ?? "localhost";
+                var port = Environment.GetEnvironmentVariable("POSTGRES_PORT") ?? "5432";
+                var dbName = Environment.GetEnvironmentVariable("POSTGRES_DB") ?? "TicketsDb";
+                var user = Environment.GetEnvironmentVariable("POSTGRES_USER") ?? "postgres";
+                var pass = Environment.GetEnvironmentVariable("POSTGRES_PASSWORD") ?? "postgres";
+
+                connectionString = $"Host={host};Port={port};Database={dbName};Username={user};Password={pass};";
+            }
 
             var optionsBuilder = new DbContextOptionsBuilder<IssueTicketServiceDbContext>();
             optionsBuilder.UseNpgsql(connectionString, opt =>
@@ -27,6 +36,7 @@ namespace IssueTicketService.Infrastructure.Connection
                     maxRetryDelay: TimeSpan.FromSeconds(5),
                     errorCodesToAdd: null
                 );
+                opt.MigrationsAssembly(typeof(IssueTicketServiceDbContext).Assembly.GetName().Name);
             });
 
             return new IssueTicketServiceDbContext(optionsBuilder.Options);

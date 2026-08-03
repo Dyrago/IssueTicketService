@@ -6,10 +6,6 @@ namespace IssueTicketService.Infrastructure.Connection
 {
     public class IssueTicketServiceDbContext : DbContext
     {
-        public IssueTicketServiceDbContext()
-        {
-
-        }
         public IssueTicketServiceDbContext(DbContextOptions<IssueTicketServiceDbContext> options) : base(options)
         {
 
