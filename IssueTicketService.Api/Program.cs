@@ -55,15 +55,6 @@ builder.Services.AddSwaggerGen(opt =>
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Host.UseSerilog();
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("FrontendCors", policy =>
-    {
-        policy.WithOrigins("http://localhost:3000")
-        .AllowAnyHeader()
-        .AllowAnyMethod();
-    });
-});
 
 builder.Services.AddAuthentication(options => {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -101,16 +92,16 @@ using (var scope = app.Services.CreateScope())
         using var context = contextFactory.CreateDbContext();
 
         var allMigrations = context.Database.GetMigrations();
-var pendingMigrations = context.Database.GetPendingMigrations();
+        var pendingMigrations = context.Database.GetPendingMigrations();
 
-Console.WriteLine($"==================================================");
-Console.WriteLine($"[EF DEBUG] Wszystkie wykryte migracje w dll: {allMigrations.Count()}");
-Console.WriteLine($"[EF DEBUG] Niewykonane migracje (Pending): {pendingMigrations.Count()}");
-Console.WriteLine($"==================================================");
+        Console.WriteLine($"==================================================");
+        Console.WriteLine($"[EF DEBUG] Wszystkie wykryte migracje w dll: {allMigrations.Count()}");
+        Console.WriteLine($"[EF DEBUG] Niewykonane migracje (Pending): {pendingMigrations.Count()}");
+        Console.WriteLine($"==================================================");
 
-        context.Database.Migrate();
+        await context.Database.MigrateAsync();
 
-        TicketsDbSeeder.Seed(context);
+        await TicketsDbSeeder.Seed(context);
     }
     catch (Exception ex)
     {
@@ -124,11 +115,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-app.UseCors("FrontendCors");
+
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
+System.Console.WriteLine("Before lunch message");
 
 app.Run();

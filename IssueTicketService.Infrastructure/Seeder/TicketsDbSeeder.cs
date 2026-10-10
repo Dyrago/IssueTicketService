@@ -7,7 +7,7 @@ namespace IssueTicketService.Infrastructure.Seeder
 {
     public static class TicketsDbSeeder
     {
-        public static void Seed(IssueTicketServiceDbContext dbContext)
+        public async static Task Seed(IssueTicketServiceDbContext dbContext)
         {
             if (!dbContext.Users.Any())
             {
@@ -72,8 +72,8 @@ namespace IssueTicketService.Infrastructure.Seeder
                     }
                 };
 
-                dbContext.Users.Add(user);
-                dbContext.SaveChanges();
+                await dbContext.Users.AddAsync(user);
+                await dbContext.SaveChangesAsync();
             }
         }
     }

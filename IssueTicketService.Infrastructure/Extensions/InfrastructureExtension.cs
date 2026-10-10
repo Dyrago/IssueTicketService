@@ -5,6 +5,7 @@ using IssueTicketService.Infrastructure.Repositories.Account;
 using IssueTicketService.Infrastructure.Repositories.Administration;
 using IssueTicketService.Infrastructure.Repositories.Role;
 using IssueTicketService.Infrastructure.Repositories.Ticket;
+using IssueTicketService.Infrastructure.Repositories.Token;
 using IssueTicketService.Infrastructure.Repositories.User;
 using IssueTicketService.Infrastructure.Repositories.UserRoles;
 using Microsoft.EntityFrameworkCore;
@@ -34,6 +35,7 @@ namespace IssueTicketService.Infrastructure.Extensions
 });
 
             services.TryAddScoped<ITicketRepository, TicketRepository>();
+            services.TryAddScoped<ITokenRepository, TokenRepository>();
             services.TryAddScoped<IUserRepository, UserRepository>();
             services.TryAddScoped<IRoleRepository, RoleRepository>();
             services.TryAddScoped<IUserRoleRepository, UserRoleRepository>();

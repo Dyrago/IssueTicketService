@@ -1,13 +1,10 @@
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using System.Text.Unicode;
 using IssueTicketService.Application.Dto.Authentication;
 using IssueTicketService.Application.Dto.Token;
 using IssueTicketService.Application.Services.User;
 using IssueTicketService.Core.Repositories;
-using Microsoft.IdentityModel.JsonWebTokens;
-using Microsoft.IdentityModel.Tokens;
 
 namespace IssueTicketService.Application.Services.Token
 {
