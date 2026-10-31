@@ -18,12 +18,12 @@ namespace IssueTicketService.Application.Services.Account
             _accountRepository = accountRepository;
         }
 
-        public async Task ChangePassword(ChangePasswordDto changePasswordDto)
+        public async Task ChangePassword(ChangePasswordDto changePasswordDto, Guid authUserId)
         {
             if (changePasswordDto.NewPassword == changePasswordDto.OldPassword)
                 throw new Exception("New password can not be the same as old password");
 
-            var user = await _userService.GetById(changePasswordDto.UserId);
+            var user = await _userService.GetById(authUserId);
 
             if (user == null)
                 throw new Exception("Old password is invalid.");
@@ -38,7 +38,7 @@ namespace IssueTicketService.Application.Services.Account
             if (passwordResult == null)
                 throw new Exception("Error during operation.");
 
-            await _accountRepository.ChangePassword(changePasswordDto.UserId, passwordResult.Password, passwordResult.Salt);
+            await _accountRepository.ChangePassword(authUserId, passwordResult.Password, passwordResult.Salt);
         }
 
         public async Task Delete(Guid authorizedUserId, Guid userId)

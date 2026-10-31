@@ -23,7 +23,9 @@ namespace IssueTicketService.Api.Controllers.Account
         {
             try
             {
-                await _accountService.ChangePassword(changePasswordDto);
+                var authUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                await _accountService.ChangePassword(changePasswordDto, new Guid(authUserId));
 
                 return Ok();
             }
