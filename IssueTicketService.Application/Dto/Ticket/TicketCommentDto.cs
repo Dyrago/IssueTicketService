@@ -1,3 +1,4 @@
+using IssueTicketService.Application.Helpers;
 using IssueTicketService.Core.Entities;
 
 namespace IssueTicketService.Application.Dto.Ticket
@@ -18,7 +19,7 @@ namespace IssueTicketService.Application.Dto.Ticket
         {
             Id = comment.Id;
             Content = comment.Content;
-            CreateDate = comment.CreateDate;
+            CreateDate = DateTimeFormater.ToPolishTime(comment.CreateDate);
             UserEmail = comment.User.Email;
         }
     }
