@@ -1,3 +1,4 @@
+using IssueTicketService.Application.Helpers;
 using IssueTicketService.Core.Entities;
 using IssueTicketService.Core.Enums;
 
@@ -23,7 +24,7 @@ namespace IssueTicketService.Application.Dto.Ticket
         public TicketResponseDto(Core.Entities.Ticket ticket)
         {
             Id = ticket.Id;
-            CreateDate = ticket.CreateDate;
+            CreateDate = DateTimeFormater.ToPolishTime(ticket.CreateDate);
             Title = ticket.Title;
             Content = ticket.Content;
             ReporterId = ticket.ReporterId;

@@ -42,7 +42,7 @@ namespace IssueTicketService.Application.Services.Ticket
             if (canComment)
                 await _ticketCommentRepository.Create(new Core.Entities.Comment()
                 {
-                    CreateDate = DateTime.Now,
+                    CreateDate = DateTime.UtcNow,
                     TicketId = comment.TicketId,
                     UserId = userId,
                     Content = comment.Content

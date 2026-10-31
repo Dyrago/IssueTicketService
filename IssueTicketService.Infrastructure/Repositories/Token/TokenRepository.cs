@@ -15,6 +15,14 @@ namespace IssueTicketService.Infrastructure.Repositories.Token
             _contextFactory = contextFactory;
         }
 
+        public async Task<RefreshToken?> GetRefreshToken(string refreshToken)
+        {
+            using var context = await _contextFactory.CreateDbContextAsync();
+
+            return await context.RefreshTokens.Where(rt => rt.TokenValue == refreshToken &&
+                                                   rt.IsRevoked == false).FirstOrDefaultAsync();
+        }
+
         public async Task SaveRefreshToken(RefreshToken refreshToken)
         {
             using var context = await _contextFactory.CreateDbContextAsync();
@@ -30,7 +38,7 @@ namespace IssueTicketService.Infrastructure.Repositories.Token
 
             await context.RefreshTokens.Where(rt => rt.TokenValue == refreshToken.TokenValue && rt.UserId == userId)
                                        .ExecuteUpdateAsync(t => t.SetProperty(t => t.IsRevoked, true)
-                                                                  .SetProperty(t => t.RevokeDate, DateTime.Now));
+                                                                  .SetProperty(t => t.RevokeDate, DateTime.UtcNow));
 
             await context.SaveChangesAsync();
         }

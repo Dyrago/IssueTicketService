@@ -25,7 +25,8 @@ namespace IssueTicketService.Application.Services.Ticket
             {
                 Title = dto.Title,
                 Content = dto.Content,
-                ReporterId = userGuid
+                ReporterId = userGuid,
+                CreateDate = DateTime.UtcNow
             };
 
             await _ticketRepository.Create(ticket);

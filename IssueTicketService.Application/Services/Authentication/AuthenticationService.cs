@@ -62,9 +62,21 @@ namespace IssueTicketService.Application.Services.Authentication
             return newUserId;
         }
 
-        public async Task<TokenResult> RefreshAccess(RefreshDataDto dto)
+        public async Task<TokenResult> RefreshAccess(string refreshToken)
         {
-            return await _tokenService.Refresh(dto);
+            return await _tokenService.Refresh(refreshToken);
+        }
+
+        public async Task<CurrentDto?> GetCurrent(Guid id)
+        {
+            var user = await _userService.GetById(id);
+
+            return new CurrentDto()
+            {
+                Id = user.Id,
+                Email = user.Email,
+                roles = user.Roles.Select(x => x.Name).ToList()
+            };
         }
     }
 }

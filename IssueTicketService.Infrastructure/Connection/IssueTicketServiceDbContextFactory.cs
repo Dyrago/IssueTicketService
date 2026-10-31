@@ -22,8 +22,8 @@ namespace IssueTicketService.Infrastructure.Connection
                 var host = Environment.GetEnvironmentVariable("POSTGRES_HOST") ?? "localhost";
                 var port = Environment.GetEnvironmentVariable("POSTGRES_PORT") ?? "5432";
                 var dbName = Environment.GetEnvironmentVariable("POSTGRES_DB") ?? "TicketsDb";
-                var user = Environment.GetEnvironmentVariable("POSTGRES_USER") ?? "postgres";
-                var pass = Environment.GetEnvironmentVariable("POSTGRES_PASSWORD") ?? "postgres";
+                var user = Environment.GetEnvironmentVariable("POSTGRES_USER") ?? "admin";
+                var pass = Environment.GetEnvironmentVariable("POSTGRES_PASSWORD") ?? "SuperSecretPassword";
 
                 connectionString = $"Host={host};Port={port};Database={dbName};Username={user};Password={pass};";
             }

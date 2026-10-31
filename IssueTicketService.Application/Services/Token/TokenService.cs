@@ -4,7 +4,9 @@ using System.Text;
 using IssueTicketService.Application.Dto.Authentication;
 using IssueTicketService.Application.Dto.Token;
 using IssueTicketService.Application.Services.User;
+using IssueTicketService.Core.Entities;
 using IssueTicketService.Core.Repositories;
+using Microsoft.Extensions.Configuration;
 
 namespace IssueTicketService.Application.Services.Token
 {
@@ -13,23 +15,27 @@ namespace IssueTicketService.Application.Services.Token
         private readonly ITokenProvider _tokenProvider;
         private readonly IUserService _userService;
         private readonly ITokenRepository _tokenRepository;
+        private readonly IConfiguration _config;
         
 
         public TokenService(
             ITokenProvider tokenProvider,
             IUserService userService,
-            ITokenRepository tokenRepository)
+            ITokenRepository tokenRepository,
+            IConfiguration configuration)
         {
             _tokenProvider = tokenProvider;
             _userService = userService;
             _tokenRepository = tokenRepository;
+            _config = configuration;
         }
 
         public async Task<TokenResult> Create(Core.Entities.User user)
         {
             var userClaims = new List<Claim>
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),                
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),  
+                new Claim(ClaimTypes.Email, user.Email)
             };
 
             foreach (var role in user.Roles)
@@ -43,9 +49,9 @@ namespace IssueTicketService.Application.Services.Token
             
             await _tokenRepository.SaveRefreshToken(new Core.Entities.RefreshToken()
             {
-               CreateDate = DateTime.Now,
-               Expires = DateTime.Now.AddDays(7),
-               TokenValue = SHA256.HashData(Encoding.UTF8.GetBytes(refreshToken)).ToString(),
+               CreateDate = DateTime.UtcNow,
+               Expires = DateTime.UtcNow.AddDays(_config.GetValue<int>("Jwt:RefreshLifetimeInDays")),
+               TokenValue = RefreshToken.HashTokenValue(refreshToken),
                UserId = user.Id
             });
 
@@ -56,51 +62,42 @@ namespace IssueTicketService.Application.Services.Token
             };
         }
 
-        public async Task<TokenResult> Refresh(RefreshDataDto dto)
+        public async Task<TokenResult> Refresh(string refreshToken)
         {
-            ClaimsPrincipal principal;
-            try
-            {
-                principal = await _tokenProvider.GetClaimsFromExpiredToken(dto.AccessToken);
-            }
-            catch (Exception)
-            {
-                throw new UnauthorizedAccessException("Invalid token.");
-            }
+            var userRefreshToken = await _tokenRepository.GetRefreshToken(RefreshToken.HashTokenValue(refreshToken));
 
-            var userIdClaim = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? 
-                         principal.FindFirst("sub")?.Value;
+            if(userRefreshToken == null)
+                throw new Exception("Token not found");
 
-            if (userIdClaim == null)
-                throw new Exception("User not found.");
-
-            var userId = new Guid(userIdClaim);
-
-            var user = await _userService.GetById(userId);
+            var user = await _userService.GetById(userRefreshToken.UserId);
 
             if (user == null)
                 throw new Exception("User not found.");
 
-            var refreshToken = user.RefreshTokens.FirstOrDefault(rt =>
-             rt.IsRevoked == false &&
-             rt.TokenValue == SHA256.HashData(Encoding.UTF8.GetBytes(dto.RefreshToken)).ToString());
-            
-            if (refreshToken == null)
-                throw new Exception("Invalid refresh token.");
-
-            await _tokenRepository.Revoke(refreshToken, userId);
+            await _tokenRepository.Revoke(userRefreshToken, user.Id);
 
             var newRefreshToken = _tokenProvider.GenerateRefreshToken();
 
             await _tokenRepository.SaveRefreshToken(new Core.Entities.RefreshToken()
             {
-               CreateDate = DateTime.Now,
-               Expires = DateTime.Now.AddDays(7),
-               TokenValue = SHA256.HashData(Encoding.UTF8.GetBytes(newRefreshToken)).ToString(),
+               CreateDate = DateTime.UtcNow,
+               Expires = DateTime.UtcNow.AddDays(_config.GetValue<int>("Jwt:RefreshLifetimeInDays")),
+               TokenValue = RefreshToken.HashTokenValue(newRefreshToken),
                UserId = user.Id
             });
 
-            var newAccessToken =_tokenProvider.GenerateToken(new ClaimsIdentity(principal.Claims));
+            var userClaims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Email, user.Email)
+            };
+
+            foreach (var role in user.Roles)
+            {
+                userClaims.Add(new Claim(ClaimTypes.Role, role.Name.ToString()));
+            }
+
+            var newAccessToken =_tokenProvider.GenerateToken(new ClaimsIdentity(userClaims));
 
             return new TokenResult()
             {

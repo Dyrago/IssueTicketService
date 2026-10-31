@@ -1,66 +1,65 @@
 <script lang="ts">
 	import favicon from '$lib/assets/favicon.svg';
-
+	import '../lib/styles/styles.css'
 	let { children } = $props();
 </script>
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
-	<link rel="../lib/styles/styles.css" type="stylesheet" />
 </svelte:head>
 
-<div class="container">
+<div>
 	<header>
-		<h1><a href="/">IssueTicketService</a></h1>
+		<a href="/"><img src="../src/lib/assets/favicon.svg" alt="Icon"></a>
 	</header>
 
 	{@render children()}
 
 	<footer id="footer">
-		Created by Dyrago
+		Created by ®Dyrago
 	</footer>
 </div>
 
 <style>
-	*{
-		margin: 0;
-		padding: 0;
-		box-sizing: border-box;
-	}
-
-	body
-	{
-		margin: 0;
-		padding: 0;
-		box-sizing: border-box;
-	}
 
 	header{
 		margin-bottom: 1rem;
 		border: 1px solid black;
 		padding: 1rem;
 		color: #fff;
-		background-color: blue;
+		background-color: rgb(28, 28, 221);
+		display: grid;
+		grid-template-columns: repeat(12, 1fr);
 	}
 
-	h1 > a {
-		direction: none;
-		text-decoration: none;
-		color: #fff;
-	}
-
-	.container{
+	nav{
+		grid-column: 12/13;
 		display: flex;
+		gap: 0.5rem;
 		flex-direction: column;
-		min-height: 100dvh;
+		justify-content: center;
 	}
+
+	nav > a > button{
+        border: 1px solid black;
+        border-radius: 10px;
+        text-decoration: none;
+        background-color: orangered;
+        padding: 0.5rem;
+        color: #fff;
+		font-weight: 600;
+		font-size: large;
+		width: 100%;
+        cursor: pointer;
+    }
 
 	footer{
-		border: 1px solid black;
 		padding: 1rem;
 		margin-top: 1rem;
 		background-color: #333;
 		color: #fff;
+		font-size: medium;
+		font-weight: 500;
 		text-align: center;
 	}
 </style>

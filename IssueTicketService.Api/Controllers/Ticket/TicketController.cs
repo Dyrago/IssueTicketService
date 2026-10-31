@@ -46,8 +46,7 @@ namespace IssueTicketService.Api.Controllers
 
                 if (!User.IsInRole(RoleEnum.Admin.ToString()) || !User.IsInRole(RoleEnum.Moderator.ToString()))
                     filter.ReporterId = new Guid(userGuid);
-
-                return Ok(await _ticketService.Search(filter));
+                    return Ok(await _ticketService.Search(filter));
             }
             catch (Exception ex)
             {
@@ -92,7 +91,7 @@ namespace IssueTicketService.Api.Controllers
             {
                 await _ticketService.ChangeStatus(id, statusId);
 
-                return Ok(new { Data = "Status changed successfuly." });
+                return Ok( "Status changed successfuly.");
             }
             catch (Exception ex)
             {

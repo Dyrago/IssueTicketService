@@ -1,4 +1,5 @@
 using System.Net;
+using System.Security.Claims;
 using IssueTicketService.Application.Dto.Authentication;
 using IssueTicketService.Application.Services.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -28,7 +29,7 @@ namespace IssueTicketService.Api.Controllers.Authentication
                 if (token == null)
                     return StatusCode(500);
 
-                return Ok(new { Data = token});
+                return Ok(token);
             }
             catch (Exception ex)
             {
@@ -53,20 +54,37 @@ namespace IssueTicketService.Api.Controllers.Authentication
         }
 
         [HttpPost("Authentication/Refresh")]
-        public async Task<IActionResult> Refresh(RefreshDataDto dto)
+        public async Task<IActionResult> Refresh([FromBody]string refreshToken)
         {
             try
             {
-                if (!Request.Cookies.TryGetValue("RfsTkn", out var refreshToken))
+                if (string.IsNullOrEmpty(refreshToken))
                 {
                     return Unauthorized("Refresh token is missing.");
                 }
-
-                var uc = User.Claims;
                 
-                var result = await _authenticationService.RefreshAccess(dto);
+                var result = await _authenticationService.RefreshAccess(refreshToken);
 
                 return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return StatusCode(500);
+            }
+        }
+
+        [HttpGet("Authentication/Current")]
+        public async Task<IActionResult> GetCurrent()
+        {
+            try
+            {
+                var userId = Request.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                if (string.IsNullOrEmpty(userId))
+                    return Unauthorized();
+                
+                return Ok(await _authenticationService.GetCurrent(new Guid(userId)));
             }
             catch (Exception ex)
             {

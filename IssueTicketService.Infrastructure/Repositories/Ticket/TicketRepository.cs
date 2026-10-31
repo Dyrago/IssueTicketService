@@ -48,12 +48,11 @@ namespace IssueTicketService.Infrastructure.Repositories.Ticket
             if (!string.IsNullOrEmpty(filter.Contains))
                 query = query.Where(t => t.Content.Contains(filter.Contains) || t.Title.Contains(filter.Contains));
 
-            if (filter.DateFrom.HasValue)
-                query = query.Where(t => t.CreateDate >= filter.DateFrom);          
+            var dateFrom = filter.DateFrom?.ToUniversalTime();
+            var dateTo = filter.DateTo?.ToUniversalTime();
 
-            if (filter.DateTo.HasValue)
-                query = query.Where(t => t.CreateDate <= filter.DateTo);          
-
+            if (dateFrom.HasValue || dateTo.HasValue)
+                query = query.Where(t => t.CreateDate >= dateFrom || t.CreateDate <= dateTo);                 
 
             var tickets = await query.ToListAsync();
 

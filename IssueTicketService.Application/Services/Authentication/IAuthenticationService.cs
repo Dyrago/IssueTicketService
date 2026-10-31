@@ -7,6 +7,7 @@ namespace IssueTicketService.Application.Services.Authentication
     {
         Task<TokenResult?> Login(LoginDto login);
         Task<Guid?> Register(RegisterUserDto registerDto);
-        Task<TokenResult> RefreshAccess(RefreshDataDto dto);
+        Task<TokenResult> RefreshAccess(string refreshToken);
+        Task<CurrentDto?> GetCurrent(Guid id);
     }
 }

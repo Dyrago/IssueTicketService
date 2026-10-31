@@ -7,8 +7,8 @@ namespace IssueTicketService.Core.BusinessObjects
     {
         [MaxLength(50)]
         public string? Contains { get; set; }
-        public DateTime? DateFrom { get; set; }
-        public DateTime? DateTo { get; set; }
+        public DateTime? DateFrom { get; set; } = DateTime.UtcNow;
+        public DateTime? DateTo { get; set; } = DateTime.UtcNow;
         public Guid? ResolverId { get; set; }
         public Guid? ReporterId { get; set; }
         public int? TicketStatusId { get; set; }
