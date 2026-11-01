@@ -1,8 +1,6 @@
-using System.Net;
 using System.Security.Claims;
 using IssueTicketService.Application.Dto.Authentication;
 using IssueTicketService.Application.Services.Authentication;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IssueTicketService.Api.Controllers.Authentication
@@ -27,9 +25,35 @@ namespace IssueTicketService.Api.Controllers.Authentication
                 var token = await _authenticationService.Login(login);
 
                 if (token == null)
-                    return StatusCode(500);
+                    return StatusCode(400);
 
                 return Ok(token);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                return StatusCode(500);
+            }
+        }
+
+        [HttpPost("Authentication/Logout")]
+        public async Task<IActionResult> Logout()
+        {
+            try
+            {   
+                var refreshTokenCookieValue = Request.Cookies.FirstOrDefault(c => c.Key == "RfsTkn").Value;
+
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                if(string.IsNullOrEmpty(userId))
+                    return StatusCode(StatusCodes.Status400BadRequest);
+
+                await _authenticationService.Logout(refreshTokenCookieValue, new Guid(userId));
+
+                Response.Cookies.Delete("RfsTkn");
+                Response.Cookies.Delete("authJwt");
+
+                return Ok();
             }
             catch (Exception ex)
             {

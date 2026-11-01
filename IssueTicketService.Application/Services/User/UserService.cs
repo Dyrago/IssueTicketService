@@ -1,4 +1,5 @@
 
+using IssueTicketService.Application.Dto.Authentication;
 using IssueTicketService.Core.Repositories;
 
 namespace IssueTicketService.Application.Services.User
@@ -17,9 +18,9 @@ namespace IssueTicketService.Application.Services.User
             return await _userRepository.Create(user);
         }
 
-        public Task Delete(int id)
+        public async Task Delete(Guid id)
         {
-            throw new NotImplementedException();
+            await _userRepository.Delete(id);
         }
 
         public async Task<Core.Entities.User?> GetByEmail(string email)
@@ -32,7 +33,7 @@ namespace IssueTicketService.Application.Services.User
             return await _userRepository.GetById(id);
         }
 
-        public Task Update(int id, Core.Entities.User ticket)
+        public Task Update(Guid id, Core.Entities.User user)
         {
             throw new NotImplementedException();
         }

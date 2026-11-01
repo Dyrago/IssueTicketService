@@ -4,7 +4,9 @@ using IssueTicketService.Application.Dto.Token;
 using IssueTicketService.Application.Services.Token;
 using IssueTicketService.Application.Services.User;
 using IssueTicketService.Application.Services.UserRole;
+using IssueTicketService.Core.Entities;
 using IssueTicketService.Core.Enums;
+using IssueTicketService.Core.Repositories;
 
 namespace IssueTicketService.Application.Services.Authentication
 {
@@ -13,16 +15,19 @@ namespace IssueTicketService.Application.Services.Authentication
         private readonly ITokenService _tokenService;
         private readonly IUserService _userService;
         private readonly IUserRoleService _userRoleService;
+        private readonly ITokenRepository _tokenRepository;
 
         public AuthenticationService(
             ITokenService tokenService,
             IUserService userService,
-            IUserRoleService userRoleService
+            IUserRoleService userRoleService,
+            ITokenRepository tokenRepository
         )
         {
             _tokenService = tokenService;
             _userService = userService;
             _userRoleService = userRoleService;
+            _tokenRepository = tokenRepository;
         }
 
         public async Task<TokenResult?> Login(LoginDto login)
@@ -32,7 +37,20 @@ namespace IssueTicketService.Application.Services.Authentication
             if (user == null)
                 return null;
 
-            return await _tokenService.Create(user);
+            bool correctPassword = PasswordService.PasswordService.VerifyPassword(login.Password, user.Password, user.Salt);
+
+            if(user != null && user.Email == login.Email && correctPassword)
+                return await _tokenService.Create(user);
+
+            return null;
+        }
+
+        public async Task Logout(string refreshToken, Guid userId)
+        {
+            var userRefreshToken = await _tokenRepository.GetRefreshToken(RefreshToken.HashTokenValue(refreshToken));
+            
+            if(userRefreshToken != null)
+                await _tokenRepository.Revoke(userRefreshToken, userId);
         }
 
         public async Task<Guid?> Register(RegisterUserDto register)
