@@ -29,7 +29,7 @@ namespace IssueTicketService.Application.Services.PasswordService
 
         public static bool VerifyPassword(string inputPassword, string userPassword, string userSalt)
         {
-            var haseToCompare = Rfc2898DeriveBytes.Pbkdf2(inputPassword, Encoding.UTF8.GetBytes(userSalt),
+            var haseToCompare = Rfc2898DeriveBytes.Pbkdf2(inputPassword, Convert.FromBase64String(userSalt),
                     _iteration, hashAlgorithmName, _keySize);
 
                 return CryptographicOperations.FixedTimeEquals(haseToCompare, Convert.FromBase64String(userPassword));
