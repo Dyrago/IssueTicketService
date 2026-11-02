@@ -1,5 +1,11 @@
+<script lang="ts">
+    import type { PageProps } from "./$types"; 
+    let { data } : PageProps = $props(); 
+</script>
+
 <div id="task-grid">
     <div class="dashboard-filters">
+    <form method="POST">
         <input type="text" placeholder="Title"/>
         <input type="text" placeholder="Content"/>
         <input type="datetime" />
@@ -15,102 +21,29 @@
             <option>user@tickets.com</option>
         </select>
         <button>Search</button>
+    </form>
     </div>
     <nav class="dashboard-actions">
-        <button id="btn-create"> Create</button>
-        <button id="btn-create"> Create</button>
-        <button id="btn-create"> Create</button>
         <button id="btn-create"> Create</button>
     </nav>
     <div class="task-col">
         <div class="col-label">New</div>
-        <div class="task-item">
-            <h4>This is task item title</h4>
-        </div>
-        <div class="task-item">
-            <h4>This is task item title</h4>
-        </div>
-        <div class="task-item">
-            <h4>This is task item title</h4>
-        </div>
-        <div class="task-item">
-            <h4>This is task item title</h4>
-        </div>
-        <div class="task-item">
-            <h4>This is task item title</h4>
-        </div>
-        <div class="task-item">
-            <h4>This is task item title</h4>
-        </div>
-        <div class="task-item">
-            <h4>This is task item title</h4>
-        </div>
-        <div class="task-item">
-            <h4>This is task item title</h4>
-        </div>
-        <div class="task-item">
-            <h4>This is task item title</h4>
-        </div>
-        <div class="task-item">
-            <h4>This is task item title</h4>
-        </div>
-        <div class="task-item">
-            <h4>This is task item title</h4>
-        </div>
-        <div class="task-item">
-            <h4>This is task item title</h4>
-        </div>
-        <div class="task-item">
-            <h4>This is task item title</h4>
-        </div>
-        <div class="task-item">
-            <h4>This is task item title</h4>
-        </div>
-        <div class="task-item">
-            <h4>This is task item title</h4>
-        </div>
-        <div class="task-item">
-            <h4>This is task item title</h4>
-        </div>
-        <div class="task-item">
-            <h4>This is task item title</h4>
-        </div>
-        <div class="task-item">
-            <h4>This is task item title</h4>
-        </div>
-        <div class="task-item">
-            <h4>This is task item title</h4>
-        </div>
-        <div class="task-item">
-            <h4>This is task item title</h4>
-        </div>
-        <div class="task-item">
-            <h4>This is task item title</h4>
-        </div>
+        {#if data.tickets}
+            {#each data.tickets as ticket}
+                <div class="task-item">
+                    <h4>#{ticket.id} - {ticket.title}</h4>
+                    <p>{ticket.status}</p>
+                    <p>{ticket.createDate.toString("yyyy-MM-dd")}</p>
+                </div>
+            {/each}
+        {/if}
     </div>
     <div class="task-col">
         <div class="col-label">In Progress</div>
-        <div class="task-item">
-            <h4>This is task item title</h4>
-        </div>
-        <div class="task-item">
-            <h4>This is task item title</h4>
-        </div>
     </div>
     <div class="task-col">
         <div class="col-label">Done</div>
-        <div class="task-item">
-            <h4>This is task item title</h4>
-        </div>
-        <div class="task-item">
-            <h4>This is task item title</h4>
-        </div>
-        <div class="task-item">
-            <h4>This is task item title</h4>
-        </div>
-        <div class="task-item">
-            <h4>This is task item title</h4>
-        </div>
+        
     </div>
 </div>
 

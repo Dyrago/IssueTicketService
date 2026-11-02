@@ -22,8 +22,9 @@ namespace IssueTicketService.Api.Controllers
             _logger = logger;
         }
 
-        [HttpGet("Tickets")]
-        public async Task<IActionResult> Search(TicketSearchFilter filter)
+        [Authorize(Roles = "Admin,Mod,User")]
+        [HttpPost("Tickets")]
+        public async Task<IActionResult> Search([FromBody]TicketSearchFilter filter)
         {
             try
             {
@@ -46,7 +47,8 @@ namespace IssueTicketService.Api.Controllers
 
                 if (!User.IsInRole(RoleEnum.Admin.ToString()) || !User.IsInRole(RoleEnum.Moderator.ToString()))
                     filter.ReporterId = new Guid(userGuid);
-                    return Ok(await _ticketService.Search(filter));
+                    
+                return Ok(await _ticketService.Search(filter));
             }
             catch (Exception ex)
             {
@@ -55,6 +57,7 @@ namespace IssueTicketService.Api.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin,Mod,User")]
         [HttpGet("Ticket/{id}")]
         public async Task<IActionResult> GetById(int id)
         {
