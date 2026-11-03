@@ -51,8 +51,8 @@
 <div id="sidebar">
 	<div id="sidebar-opts">
 		<span class="closebtn" onclick= {closeSidebar}>&times;</span>
-		<a href="Profile" class="opt-item">Profile</a>
-		<a href="Settings" class="opt-item">Settings</a>
+		<a href="/Account/Profile" class="opt-item">Profile</a>
+		<a href="/Account/Settings" class="opt-item">Settings</a>
 		<button class="opt-item" onclick={logout}>Logout</button>
 	</div>
 </div>
